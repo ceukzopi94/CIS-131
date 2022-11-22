@@ -21,7 +21,7 @@ class DealerHand(Hand):
 
     def __str__(self):
         """Return a string representation of the dealer hand."""
-        hand_string = 'Dealer Hand:\n'
+        hand_string = 'Dealer Hand:\n\n'
 
         if self.show_hand:
             for index, card in enumerate(self.hand):

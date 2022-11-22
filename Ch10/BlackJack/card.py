@@ -29,6 +29,20 @@ class Card:
         return str(self).replace(' ','_') 
 
 
+    def determine_card_value(self, hand_value):
+        """Determine the value of the card face."""
+        if self.face == 'Ace':
+            if hand_value > 21:  # makes ace value dynamic based on best possible option
+                return 1
+
+            return 11
+
+        if self.face == 'Jack' or self.face == 'Queen' or self.face == 'King':  # assigns face card values
+            return 10
+
+        return int(self.face)
+
+
     def __repr__(self):
         """Return string representation for repr()."""
         return f"Card(face='{self.face}', suit='{self.suit}'"
