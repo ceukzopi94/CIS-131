@@ -108,7 +108,7 @@ def take_bets(machine_credits):
 
 
 def invalid_bet(machine_credits, bet):
-    """Function to determine if bet is valid or not"""
+    """Function to determine if bet is valid or not."""
     if(bet == SENTINAL_VALUE):
         return False
 

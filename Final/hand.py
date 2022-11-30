@@ -61,6 +61,8 @@ class Hand:
                 print('')
                 print('Blackjack!')
 
+        
+
         print('*' * 20)
 
 
