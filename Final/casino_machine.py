@@ -1,4 +1,4 @@
-from dealerhand import DealerHand
+import os
 import tkinter as tk #imports everything from tkinter
 from tkinter import font as font
 from credits import Credits
@@ -24,6 +24,9 @@ from playerhand import PlayerHand
 #                             command=root.quit, width=5, height=1, anchor=SE)
 # button_quit.grid(row=5, column=5, padx=10,pady=10)
 
+folder = os.path.realpath(os.path.dirname(__file__))
+#call to get the path to eliminate need to hardcode path, fixes error when running code to different machines and needind different path.
+file_path = os.path.dirname(os.path.abspath(__file__)) 
 
 frame_styles = {"relief": "groove",
                 "bd": 3, "bg": "#1C3AEC",
@@ -37,7 +40,7 @@ class CasinoApp(tk.Tk):
 
     def __init__(self, *args, **kwargs):
 
-        self.machine_credits = Credits(100)
+        self.machine_credits = Credits(50)
 
         tk.Tk.__init__(self, *args, **kwargs)
         main_frame = tk.Frame(self, bg="#280FE0", height=600, width=1024)
@@ -76,13 +79,13 @@ class CasinoApp(tk.Tk):
         # frame.tkraise()
         #self.game_frames.configure(state='disabled')
         frame = self.game_frames[name]
-        frame.update_credits_gui()
+        frame.credits_widget.update_credits_gui()
         frame.tkraise()
 
     def back_to_menu(self):
         """Function to send game back to menu."""
         frame = self.game_frames[GameOptionWidgets]
-        frame.update_credits_gui()
+        frame.credits_widget.update_credits_gui()
         frame.tkraise()
 
     #cashout player - cash player out, quit game.
@@ -109,31 +112,31 @@ class GUI(tk.Frame):
         # if(controller.on_main_menu):
 
         #Credits Widget
-        self.credits = controller.machine_credits
+        self.credits_widget = CreditsWidget(self, controller)
+        # self.credits = controller.machine_credits
 
-        credits_frame = tk.LabelFrame(
-            self, frame_styles)
-        credits_frame.place(relx=0, rely=1, anchor='sw')
+        # credits_frame = tk.LabelFrame(
+        #     self, frame_styles)
+        # credits_frame.place(relx=0, rely=1, anchor='sw')
 
-        credits_frame.grid_rowconfigure(0, weight=1)
-        credits_frame.grid_columnconfigure(0, weight=1)
+        # credits_frame.grid_rowconfigure(0, weight=1)
+        # credits_frame.grid_columnconfigure(0, weight=1)
 
-        self.credits_text = tk.Label(credits_frame, text=f'Credits: {self.credits.balance}',
-                                font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-                                padx=20, pady=10, anchor='sw')
+        # self.credits_text = tk.Label(credits_frame, text=f'Credits: {self.credits.balance}',
+        #                         font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
+        #                         padx=20, pady=10, anchor='sw')
 
-        cashout_button = tk.Button(credits_frame, text='Cash\nOut', font=(button_font[0], 15),
-                                   command=lambda: controller.machine_credits.deposit(
-                                       100),
-                                   padx=10, pady=5)
+        # cashout_button = tk.Button(credits_frame, text='Cash\nOut', font=(button_font[0], 15),
+        #                            command=lambda: self.cash_out_gui(),
+        #                            padx=10, pady=5)
 
-        add_credits_button = tk.Button(credits_frame, text='Add\nCredits', font=(button_font[0], 15),
-                                       command=lambda: self.add_credits_gui(100),
-                                       padx=10, pady=5)
+        # add_credits_button = tk.Button(credits_frame, text='Add\nCredits', font=(button_font[0], 15),
+        #                                command=lambda: self.add_credits_gui(100),
+        #                                padx=10, pady=5)
 
-        cashout_button.grid(row=5, column=2, sticky='w', ipadx=10)
-        add_credits_button.grid(row=5, column=1, sticky='w', ipadx=10)
-        self.credits_text.grid(row=5, column=0, sticky='w')
+        # cashout_button.grid(row=5, column=2, sticky='w', ipadx=10)
+        # add_credits_button.grid(row=5, column=1, sticky='w', ipadx=10)
+        # self.credits_text.grid(row=5, column=0, sticky='w')
 
         # def get_credits_label(self):
         #     """Function to get the credits label."""
@@ -142,14 +145,19 @@ class GUI(tk.Frame):
         #                             padx=20, pady=20, anchor='sw')
 
 
-    def add_credits_gui(self, num):
-        """Function to add credits to the machine"""
-        self.credits.deposit(num)
-        self.update_credits_gui()
+    # def add_credits_gui(self, num):
+    #     """Function to add credits to the machine"""
+    #     self.credits.deposit(num)
+    #     self.update_credits_gui()
 
-    def update_credits_gui(self):
-        """Function to ensure credits gui matches machine credits."""
-        self.credits_text.config(text=f'Credits: {self.credits.balance}')
+    # def cash_out_gui(self):
+    #     """Function to control the cash out of machine credits"""
+    #     self.credits.withdraw(self.credits.balance)
+    #     self.update_credits_gui()
+
+    # def update_credits_gui(self):
+    #     """Function to ensure credits gui matches machine credits."""
+    #     self.credits_text.config(text=f'Credits: {self.credits.balance}')
 
 
 class GameOptionWidgets(GUI):
@@ -181,53 +189,131 @@ class GameOptionWidgets(GUI):
         video_poker_button.grid(row=0, column=1, padx=20, pady=20)
         craps_button.grid(row=0, column=2, padx=20, pady=20)
 
-        # #Credits Widget
-        # credits_frame = tk.LabelFrame(self, frame_styles, height=600, width=1024)
-        # credits_frame.place(relx=0, rely=1, anchor='sw')
+
+class BettingChipsWidget(GUI):
+    """Class for player betting chips"""
+    def __init__(self, parent, controller, game=None):
+        super().__init__(parent, controller)
+
+        if(game != None):
+            self.game = game
+        #betting_chips_gui = 
+        bet_btn_font = button_font
+
+        betting_chips_canvas = tk.Canvas(game.blackjack_frame)
+        betting_chips_canvas.place(anchor='s', relx=.5, rely=1)
+
+        self.bet_1_button = tk.Button(betting_chips_canvas, text='1', font=bet_btn_font,
+                                    width=4,
+                                    command=lambda: self.increase_bet(1),
+                                    state='normal')
+                                    
+        self.bet_5_button = tk.Button(betting_chips_canvas, text='5', font=bet_btn_font,
+                                    width=4,
+                                    command=lambda: self.increase_bet(5),
+                                    state='normal')
+
+        self.bet_10_button = tk.Button(betting_chips_canvas, text='10', font=bet_btn_font,
+                                    width=4,
+                                    command=lambda: self.increase_bet(10),
+                                    state='normal')
+
+        self.bet_25_button = tk.Button(betting_chips_canvas, text='25', font=bet_btn_font,
+                                    width=4,
+                                    command=lambda: self.increase_bet(25),
+                                    state='normal')
+
+        self.bet_100_button = tk.Button(betting_chips_canvas, text='100', font=bet_btn_font,
+                                    width=4,
+                                    command=lambda: self.increase_bet(100),
+                                    state='normal')
+
+        self.bet_buttons = (self.bet_1_button,self.bet_5_button,self.bet_10_button,self.bet_25_button,self.bet_100_button)
+
+        self.bet_1_button.grid(row=0, column=0, sticky='w')
+        self.bet_5_button.grid(row=0, column=1, sticky='w')
+        self.bet_10_button.grid(row=0, column=2, sticky='w')
+        self.bet_25_button.grid(row=0, column=3, sticky='w')
+        self.bet_100_button.grid(row=0, column=4, sticky='w')
+
         
-        # credits_frame.grid_rowconfigure(0, weight=1)
-        # credits_frame.grid_columnconfigure(0, weight=1)
+    def disable_bet_buttons(self):
+        """Function to disable the bet buttons using a for loop"""
+        for button in self.bet_buttons:
+            button['state'] = 'disabled'
 
-        # credits_text = tk.Label(credits_frame, text=f'Credits: {controller.machine_credits.balance}', 
-        #                             font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-        #                             padx=20, pady=20, anchor='sw')
-
-        # cashout_button = tk.Button(credits_frame, text='Cashout', font=(button_font[1], 15),
-        #                                 command=lambda: controller.machine_credits.deposit(100),
-        #                                 padx=10, pady=5)
-
-        # add_credits_button = tk.Button(credits_frame, text='Add Credits', font=(button_font[1], 15),
-        #                                 command=lambda: controller.machine_credits.deposit(100),
-        #                                padx=10, pady=5)
-
-        # cashout_button.grid(row=4, column=0, sticky='nw', ipadx=10)
-        # add_credits_button.grid(row=4, column=0, sticky='ne', ipadx=10)
-        # credits_text.grid(row=5, column=0, sticky='sw')
+    
+    def enable_bet_buttons(self):
+        """Function to enable the bet buttons using for loop"""
+        for button in self.bet_buttons:
+            #if()
+            if(int(button['text']) + self.game.current_bet <= int(self.credits_widget.credits.balance)):
+                #print(int(self.credits_widget.credits.balance))
+                button['state'] = 'normal'
+            else:
+                button['state'] = 'disabled'
 
 
-class CreditsWidget():
-    def __init__(self, controller):
+    def reset_bet(self):
+        """Function to reset the betting amount and funtionality"""
+        self.game.current_bet = 0
+        self.game.update_current_bet_gui()
+        self.enable_bet_buttons()
 
 
-        credits_frame = tk.LabelFrame(self, frame_styles, height=600, width=1024)
-        credits_frame.place(relx=0, rely=1, anchor='sw')
+    def increase_bet(self, bet_amount):
+        """Function to increase the bet when chips are clicked"""
+        self.game.current_bet += bet_amount
+        self.game.update_current_bet_gui()
+        self.enable_bet_buttons()
 
-        credits_text = tk.Label(credits_frame, text=f'Credits: {controller.machine_credits.balance}',
-                                    font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-                                    padx=20, pady=20, anchor='sw')
+        self.game.deal_button["state"] = 'normal'
 
-        cashout_button = tk.Button(credits_frame, text='Cashout', font=(button_font[1], 15),
-                                       command=lambda: controller.machine_credits.deposit(
-                                           100),
+
+
+class CreditsWidget(GUI):
+    """Class to control the credits widget."""
+    def __init__(self, parent, controller):
+
+        self.credits = controller.machine_credits
+
+        self.credits_frame = tk.LabelFrame(parent, frame_styles, height=600, width=1024)
+        self.credits_frame.place(relx=0, rely=1, anchor='sw')
+
+        self.credits_text = tk.Label(self.credits_frame, text=f'Credits: {controller.machine_credits.balance}',
+                                    font=(button_font[1], 35), fg='yellow', bg=parent.main_frame['bg'],
+                                    padx=20, pady=10, anchor='sw')
+
+        self.add_credits_button = tk.Button(self.credits_frame, text='Add Credits', font=(button_font[1], 15),
+                                        command=lambda: self.add_credits_gui(100),
                                        padx=10, pady=5)
 
-        add_credits_button = tk.Button(credits_frame, text='Add Credits', font=(button_font[1], 15),
-                                        command=lambda: controller.machine_credits.deposit(100),
+        self.cashout_button = tk.Button(self.credits_frame, text='Cashout', font=(button_font[1], 15),
+                                       command=lambda: self.cash_out_gui(),
                                        padx=10, pady=5)
 
-        cashout_button.grid(row=4, column=0, sticky='nw', ipadx=10)
-        add_credits_button.grid(row=4, column=0, sticky='ne', ipadx=10)
-        credits_text.grid(row=5, column=0, sticky='sw')
+        self.credits_text.grid(row=5, column=0, sticky='w')
+        self.add_credits_button.grid(row=5, column=1, sticky='w')
+        self.cashout_button.grid(row=5, column=2, sticky='w')
+
+    def add_credits_gui(self, num):
+        """Function to add credits to the machine"""
+        self.credits.deposit(num)
+        self.update_credits_gui()
+
+    def remove_credits_gui(self, num):
+        """Function to remove credits from current amount"""
+        self.credits.withdraw(num)
+        self.update_credits_gui()
+
+    def cash_out_gui(self):
+        """Function to control the cash out of machine credits"""
+        self.credits.withdraw(self.credits.balance)
+        self.update_credits_gui()
+
+    def update_credits_gui(self):
+        """Function to ensure credits gui matches machine credits."""
+        self.credits_text.config(text=f'Credits: {self.credits.balance}')
 
 
 class Blackjack(GUI):
@@ -236,11 +322,38 @@ class Blackjack(GUI):
     def __init__(self, parent, controller):
         super().__init__(parent, controller)
 
+        self.PLAY_GAME_MSG = '\nWould you like to play a hand of Black Jack? (y/n) '
+        self.END_GAME_MSG = '\nThank you for playing Black Jack!\n'
+
+        self.ENTER_BET_MSG = '\nHow much would you like to bet? (Enter 0 stop hand) '
+
+        self.DEALER_WINS_STATUS = 'Dealer Wins.'
+        self.DEALER_BLACKJACK = 'Dealer has blackjack.'
+        self.DEALER_BUST = 'Dealer Bust!'
+
+        self.PLAYER_WINS_STATUS = 'Player Wins!'
+        self.PLAYER_BLACKJACK = 'Player has blackjack.'
+        self.PLAYER_BUST = 'Player Bust...'
+        self.PLAYER_STAND = 'Player stands.'
+        #PLAYER_H_S_MSG = '\nHit (h) or Stand (s): '
+
+        self.BUST_STATUS = 'Bust...'
+        self.PUSH_STATUS = 'Push...'
+        self.CONTINUE_STATUS = 'Continue'
+
+        self.BLACKJACK_MULTIPLIER = 1.5
+
+
         self.player_hand = PlayerHand()
         self.dealer_hand = DealerHand()
         self.deck_of_carks = DeckOfCards()
 
         self.players = [self.player_hand, self.dealer_hand]
+
+        self.current_bet = 0
+
+        self.player_status = self.CONTINUE_STATUS
+        self.dealer_status = self.CONTINUE_STATUS
 
         #GUI Elements
         canvas_width = 1000
@@ -252,112 +365,142 @@ class Blackjack(GUI):
         self.hand_canvas = self.create_hand_canvas()
 
         side_btn_font = (button_font[0], 15)
+        bet_btn_font = (button_font[0], 20)
 
-        game_label = tk.Label(self.main_frame, text="Blackjack", font=button_font, anchor='n')
-        game_label.place(anchor='n', relx=0.5, rely=0)
+        game_lbl = tk.Label(self.main_frame, text="Blackjack", font=button_font)
+        game_lbl.place(anchor='n', relx=0.5, rely=0)
+
+        self.winner_frame = tk.Frame(self.blackjack_frame)
+        self.winner_frame.place(anchor='center', relx=.5, rely=.3)
+        self.winner_lbl = tk.Label(self.blackjack_frame, text='Winner', font=button_font)
+        self.winner_lbl.place(anchor='n', relx=.5, rely=.25)
+
+        #Game Decision Buttons
 
         self.hit_button = tk.Button(self.blackjack_frame, text='Hit', font=side_btn_font,
-                               bg='green',
-                               command=lambda: self.hit(self.player_hand),
-                               state='disabled')
-        self.hit_button.place(anchor='ne', relx=1, rely=.73)
+                                    bg='green',
+                                    command=lambda: self.hit(self.player_hand),
+                                    state='disabled')
+        self.hit_button.place(anchor='ne', relx=1, rely=.73, relwidth=.13)
 
         self.stand_button = tk.Button(self.blackjack_frame, text='Stand', font=side_btn_font,
-                               bg='red',
-                               command=lambda: self.stand(),
-                               state='disabled')
-        self.stand_button.place(anchor='ne', relx=1, rely=.8)
+                                    bg='red',
+                                    command=lambda: self.stand(),
+                                    state='disabled')
+        self.stand_button.place(anchor='ne', relx=1, rely=.8, relwidth=.13)
 
         self.deal_button = tk.Button(self.blackjack_frame, text='Deal Hand', font=side_btn_font,
-                               command=lambda: self.start_new_hand(),
-                                state='normal')
-        self.deal_button.place(anchor='ne', relx=1, rely=.87)
+                                    command=lambda: self.play_blackljack_hand(),
+                                    state='disabled')
+        self.deal_button.place(anchor='ne', relx=1, rely=.87, relwidth=.13)
+
+        #Betting Chips GUI 
+        self.betting_chips_gui = BettingChipsWidget(parent, controller, self)
+
+        # betting_chips_canvas = tk.Canvas(self.blackjack_frame)
+        # betting_chips_canvas.place(anchor='s', relx=.5, rely=1)
+
+        # self.bet_1_button = tk.Button(betting_chips_canvas, text='1', font= bet_btn_font,
+        #                             width=4,
+        #                             command=lambda: self.increase_bet(1),
+        #                             state='normal')
+                                    
+        # self.bet_5_button = tk.Button(betting_chips_canvas, text='5', font= bet_btn_font,
+        #                             width=4,
+        #                             command=lambda: self.increase_bet(5),
+        #                             state='normal')
+
+        # self.bet_10_button = tk.Button(betting_chips_canvas, text='10', font= bet_btn_font,
+        #                             width=4,
+        #                             command=lambda: self.increase_bet(10),
+        #                             state='normal')
+
+        # self.bet_25_button = tk.Button(betting_chips_canvas, text='25', font= bet_btn_font,
+        #                             width=4,
+        #                             command=lambda: self.increase_bet(25),
+        #                             state='normal')
+
+        # self.bet_100_button = tk.Button(betting_chips_canvas, text='100', font= bet_btn_font,
+        #                             width=4,
+        #                             command=lambda: self.increase_bet(100),
+        #                             state='normal')
+
+        # self.bet_buttons = (self.bet_1_button,self.bet_5_button,self.bet_10_button,self.bet_25_button,self.bet_100_button)
+
+        # self.bet_1_button.grid(row=0, column=0, sticky='w')
+        # self.bet_5_button.grid(row=0, column=1, sticky='w')
+        # self.bet_10_button.grid(row=0, column=2, sticky='w')
+        # self.bet_25_button.grid(row=0, column=3, sticky='w')
+        # self.bet_100_button.grid(row=0, column=4, sticky='w')
+
+        #Current Bet GUI
+        current_bet_canvas = tk.Canvas(self.blackjack_frame,height=100, width=200)
+        current_bet_canvas.place(anchor='center', relx=.5, rely=.5)
+
+        current_bet_lbl = tk.Label(current_bet_canvas, text='Current Bet', font=bet_btn_font)
+        current_bet_lbl.place(anchor='s', relx=.5, rely=.63)
+
+        self.current_bet_amount_lbl = tk.Label(current_bet_canvas, text=str(self.current_bet), font=bet_btn_font)
+        self.current_bet_amount_lbl.place(anchor='n', relx=.5, rely=.68)
+
+        #Main GUI 
 
         back_button = tk.Button(self.main_frame, text='More Games', font=button_font,
                                 command=lambda: controller.back_to_menu())
         back_button.place(anchor='se',relx=1, rely=1)
         
         # Start Of Gameplay
-        #self.start_new_hand()
-        #self.deal_cards()
 
-        # first_player_card = self.deck_of_carks.deal_card()
-        # #first_card = Image.open(
-        # #    f"D:/Pima/CIS 131/Final/card_images/2_of_clubs.png")
-        # first_card = Image.open(
-        #     f"D:/Pima/CIS 131/Final/card_images/{first_player_card.image_name}.png")
-        # first_card = first_card.resize((int(first_card.width/4),int(first_card.height/4)))
-        # first_player_card_img = ImageTk.PhotoImage(first_card)
-        # first_player_card_img = ImageTk.PhotoImage(Image.open(
-        #     f"D:/Pima/CIS 131/Final/card_images/{first_player_card.image_name}.png"))
-        #print(first_card)
-
-        #canvas.create_image(100, 100, image=first_player_card_img)
-
-        #player_card_lbls
-
-        # first_player_card_lbl = tk.Label(player_cards_canvas, image=first_player_card_img, padx=20)
-        # first_player_card_lbl.image=first_player_card_img
-        # first_player_card_lbl.grid(row=0, column=0,sticky='w')
-        # #first_card_lbl.place(anchor='w', relx=0, rely=.5)
-
-        # second_player_card_lbl = tk.Label(player_cards_canvas, image=first_player_card_img, padx=20)
-        # second_player_card_lbl.image=first_player_card_img
-        # second_player_card_lbl.grid(row=0, column=1, sticky='w')
-        # #second_card_lbl.place(anchor='w', relx=0, rely=.5)
-        # thrid_player_card_lbl = tk.Label(
-        #     player_cards_canvas, image=first_player_card_img, padx=20)
-        # thrid_player_card_lbl.image = first_player_card_img
-        # thrid_player_card_lbl.grid(row=0, column=2, sticky='w')
-
-        # #Credits Widget
-        # credits_frame = tk.LabelFrame(
-        #     self, frame_styles, height=600, width=1024)
-        # credits_frame.place(relx=0, rely=1, anchor='sw')
-
-        # credits_frame.grid_rowconfigure(0, weight=1)
-        # credits_frame.grid_columnconfigure(0, weight=1)
-
-        # credits_text = tk.Label(credits_frame, text=f'Credits: {controller.machine_credits.balance}',
-        #                         font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-        #                         padx=20, pady=20, anchor='sw')
-
-        # cashout_button = tk.Button(credits_frame, text='Cashout', font=(button_font[1], 15),
-        #                            command=lambda: controller.machine_credits.deposit(
-        #                                100),
-        #                            padx=10, pady=5)
-
-        # add_credits_button = tk.Button(credits_frame, text='Add Credits', font=(button_font[1], 15),
-        #                                command=lambda: controller.machine_credits.deposit(
-        #                                    100),
-        #                                padx=10, pady=5)
-
-        # cashout_button.grid(row=4, column=0, sticky='nw', ipadx=10)
-        # add_credits_button.grid(row=4, column=0, sticky='ne', ipadx=10)
-        # credits_text.grid(row=5, column=0, sticky='sw')
-
-        # def 
-
-
-    def start_new_hand(self):
-        """Function to start a new hand of blackjack."""
+    
+    def reset_game(self):
+        """Function to reset the game to default status"""
         self.clear_hand_gui()
         self.hand_canvas = self.create_hand_canvas()
 
-        self.hit_button['state'] = 'normal'
-        self.stand_button['state'] = 'normal'
+        self.hit_button['state'] = 'disabled'
+        self.stand_button['state'] = 'disabled'
+        self.deal_button['state'] = 'disabled'
+
+        self.betting_chips_gui.enable_bet_buttons()
 
         self.player_hand.set_hand([])
         self.dealer_hand.set_hand([])
 
-        self.deck_of_carks.shuffle()
+        self.update_current_bet_gui()
 
+
+    def play_blackljack_hand(self):
+        """Function to control the gameplay of a blackjack hand."""
+        self.start_new_hand()
+
+        #self.play_player_hand()
+
+
+    def start_new_hand(self):
+        """Function to start a new hand of blackjack."""
+        self.winner_lbl.place_forget()
+
+        self.clear_hand_gui()
+        self.hand_canvas = self.create_hand_canvas()
+
+        self.enable_hit_stand_btns()
+        
+        self.deal_button['state'] = 'disabled'
+
+        self.betting_chips_gui.disable_bet_buttons()
+
+        self.player_hand.set_hand([])
+        self.dealer_hand.set_hand([])
+        self.dealer_hand.show_hand = False
+        
         self.deal_cards()
+        self.determine_blackjack()
 
 
     def deal_cards(self):
         """Function deals cards in sequence to player than dealer."""
         num_cards_to_deal = len(self.players)
+        self.deck_of_carks.shuffle()
 
         # loops to deal the correct amount of cards to players
         for count in range(num_cards_to_deal):
@@ -370,30 +513,155 @@ class Blackjack(GUI):
         card_to_add = self.deck_of_carks.deal_card()
         hand.add_card(card_to_add)
 
-        self.update_hand_gui(hand, card_to_add)
+        #self.update_hand_gui(hand, card_to_add)
+        self.update_hand_gui(hand)
 
-        if(hand.determine_hand_value() >= 21):
+        if(self.determine_hand_bust(self.player_hand)):
             self.hit_button['state'] = 'disabled'
-            self.stand_button['state'] = 'disabled'
+
+            # self.disable_hit_stand_btns()
+
+            # self.play_dealer_hand()
     
 
     def stand(self):
         """Function to control the stand decision of the player."""
-        pass
+        self.disable_hit_stand_btns()
+
+        self.play_dealer_hand()
+        #self.player_status = self.BUST_STATUS
+
+
+    def play_player_hand(self):
+        """Function to player to play their hand."""
+        player_status = self.get_player_game_state()
+
+        while player_status == self.CONTINUE_STATUS: #loops to control player controls in game
+
+            player_status = self.get_player_game_state()
+
+
+    def get_player_game_state(self):
+        """Function to control the player choice."""
+        if self.determine_hand_bust(self.player_hand):
+            return self.PLAYER_BUST
+
+        if self.player_hand.determine_hand_value() == 21:
+            if(len(self.player_hand.hand) <= 2):
+                return self.PLAYER_BLACKJACK
+            return self.PLAYER_STAND
+
+        return self.CONTINUE_STATUS
+
+
+    def play_dealer_hand(self):
+        """Funtion to control the dealer gameplay."""
+        self.dealer_hand.show_hand = True
+        self.update_hand_gui(self.dealer_hand)
+
+        hand_value = self.dealer_hand.determine_hand_value()
+
+        if(hand_value < 17):
+            self.hit(self.dealer_hand)
+
+            self.play_dealer_hand()
+
+        self.process_winner()
 
     
-    def update_hand_gui(self, hand, card):
-        """Function to update the hand GUI"""
+    def determine_blackjack(self):
+        """Determines if players have natural blackjack."""
+        if(self.player_hand.determine_hand_value() == 21 or self.dealer_hand.determine_hand_value() == 21):
+            self.process_winner()
 
-        player_card = Image.open(
-            f"D:/Pima/CIS 131/Final/card_images/{card.image_name}.png")
-        player_card = player_card.resize(
-            (int(player_card.width/4), int(player_card.height/4)))
-        card_img = ImageTk.PhotoImage(player_card)
+        # if self.dealer_hand.determine_hand_value() == 21: 
+        #     if self.player_hand.determine_hand_value() == 21:
+        #         return self.PUSH_STATUS
 
-        card_lbl = tk.Label(self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
-        card_lbl.image = card_img
-        card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
+        #     return self.DEALER_BLACKJACK
+
+        # if self.player_hand.determine_hand_value() == 21:
+        #     return self.PLAYER_BLACKJACK
+
+        return 
+
+
+    def process_winner(self):
+        """Function to contol the end of a hand and determine the winner"""
+        winner = self.determine_winner()
+
+        #self.winner_lbl['state'] = 'normal'
+        self.winner_lbl.config(text=winner) 
+        self.winner_lbl.place(anchor='n', relx=.5, rely=.25)
+
+        self.disable_hit_stand_btns()
+
+        self.determine_payout(winner)
+        self.betting_chips_gui.reset_bet()
+        #self.enable_bet_buttons()
+
+
+    def determine_winner(self):
+        """Function to determine the winner and return winnning status"""
+        if (self.determine_hand_bust(self.player_hand) and self.determine_hand_bust(self.dealer_hand)):
+            return (self.PUSH_STATUS)
+        
+        if(self.determine_hand_bust(self.dealer_hand)):
+            return (self.PLAYER_WINS_STATUS)
+
+        if(self.determine_hand_bust(self.player_hand)):
+            return (self.DEALER_WINS_STATUS)
+
+        if (self.player_hand.determine_hand_value() == self.dealer_hand.determine_hand_value()):
+            return (self.PUSH_STATUS)
+
+        if (self.dealer_hand.determine_hand_value() > self.player_hand.determine_hand_value()):
+            return (self.DEALER_WINS_STATUS)
+
+        if (self.dealer_hand.determine_hand_value() < self.player_hand.determine_hand_value()):
+            return (self.PLAYER_WINS_STATUS)
+
+
+    def determine_payout(self, winner):
+        """Function to payout the player."""
+        if(winner == self.PLAYER_WINS_STATUS):
+            if(self.player_hand.determine_hand_value() == 21 and len(self.player_hand.hand) <= 2):
+                self.credits_widget.add_credits_gui(self.current_bet * self.BLACKJACK_MULTIPLIER)
+                return
+
+            self.credits_widget.add_credits_gui(self.current_bet)
+            return
+
+        if(winner == self.DEALER_WINS_STATUS):
+            self.credits_widget.remove_credits_gui(self.current_bet)
+            return
+
+        if(winner == self.PUSH_STATUS):
+            return
+
+
+    def determine_hand_bust(self, hand):
+        """Function to determine if the hand bust or not"""
+        if hand.determine_hand_value() > 21:
+            return True
+
+        return False
+
+
+    # def reset_bet(self):
+    #     """Function to reset the betting amount and funtionality"""
+    #     self.current_bet = 0
+    #     self.update_current_bet_gui()
+    #     self.betting_chips_gui.enable_bet_buttons()
+
+
+    # def increase_bet(self, bet_amount):
+    #     """Function to increase the bet when chips are clicked"""
+    #     self.current_bet += bet_amount
+    #     self.update_current_bet_gui()
+    #     self.betting_chips_gui.enable_bet_buttons()
+
+    #     self.deal_button["state"] = 'normal'
 
 
     def clear_hand_gui(self):
@@ -411,6 +679,70 @@ class Blackjack(GUI):
         dealer_cards_canvas.place(anchor='n', relx=.5, rely=0)
 
         return (player_cards_canvas, dealer_cards_canvas)
+    
+
+    # def update_hand_gui(self, hand, card):
+    #     """Function to update the hand GUI"""
+
+    #     player_card = Image.open(card.image_path)
+    #     player_card = player_card.resize((int(player_card.width/4), int(player_card.height/4)))
+    #     card_img = ImageTk.PhotoImage(player_card)
+
+    #     card_lbl = tk.Label(self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+    #     card_lbl.image = card_img
+    #     card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
+
+    def update_hand_gui(self, hand):
+        """Function to update the hand GUI"""
+
+        for card in hand.hand:
+            if(not hand.show_hand and hand.hand.index(card) == 0):
+                player_card = Image.open(card.back_image)
+            else:
+                player_card = Image.open(card.image_path)
+
+            print(player_card)
+
+            player_card = player_card.resize((int(player_card.width/4), int(player_card.height/4)))
+            card_img = ImageTk.PhotoImage(player_card)
+
+            card_lbl = tk.Label(self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+            card_lbl.image = card_img
+            card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
+
+    
+    def update_current_bet_gui(self):
+        """Function to control the current bet GUI to ensure it shows proper amount."""
+        self.current_bet_amount_lbl.config(text=str(self.current_bet))
+
+
+    # def disable_bet_buttons(self):
+    #     """Function to disable the bet buttons using a for loop"""
+    #     for button in self.bet_buttons:
+    #         button['state'] = 'disabled'
+
+    
+    # def enable_bet_buttons(self):
+    #     """Function to enable the bet buttons using for loop"""
+    #     for button in self.bet_buttons:
+    #         #if()
+    #         if(int(button['text']) + self.current_bet <= int(self.credits_widget.credits.balance)):
+    #             print(int(self.credits_widget.credits.balance))
+    #             button['state'] = 'normal'
+    #         else:
+    #             button['state'] = 'disabled'
+
+    
+    def enable_hit_stand_btns(self):
+        """Function to enable the hit and stand buttons"""
+        self.hit_button['state'] = 'normal'
+        self.stand_button['state'] = 'normal'
+
+
+    def disable_hit_stand_btns(self):
+        """Function to enable the hit and stand buttons"""
+        self.hit_button['state'] = 'disabled'
+        self.stand_button['state'] = 'disabled'
 
 
 class Video_Poker(GUI):
@@ -425,32 +757,6 @@ class Video_Poker(GUI):
                                 command=lambda: controller.back_to_menu())
         back_button.grid(row=5, column=5)
 
-        # #Credits Widget
-        # credits_frame = tk.LabelFrame(
-        #     self, frame_styles, height=600, width=1024)
-        # credits_frame.place(relx=0, rely=1, anchor='sw')
-
-        # credits_frame.grid_rowconfigure(0, weight=1)
-        # credits_frame.grid_columnconfigure(0, weight=1)
-
-        # credits_text = tk.Label(credits_frame, text=f'Credits: {controller.machine_credits.balance}',
-        #                         font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-        #                         padx=20, pady=20, anchor='sw')
-
-        # cashout_button = tk.Button(credits_frame, text='Cashout', font=(button_font[1], 15),
-        #                            command=lambda: controller.machine_credits.deposit(
-        #                                100),
-        #                            padx=10, pady=5)
-
-        # add_credits_button = tk.Button(credits_frame, text='Add Credits', font=(button_font[1], 15),
-        #                                command=lambda: controller.machine_credits.deposit(
-        #                                    100),
-        #                                padx=10, pady=5)
-
-        # cashout_button.grid(row=4, column=0, sticky='nw', ipadx=10)
-        # add_credits_button.grid(row=4, column=0, sticky='ne', ipadx=10)
-        # credits_text.grid(row=5, column=0, sticky='sw')
-
 
 class Craps(GUI):
     """Class that controls Craps GUI"""
@@ -464,33 +770,6 @@ class Craps(GUI):
         back_button = tk.Button(self.main_frame, text='Main Menu', font=button_font,
                                 command=lambda: controller.back_to_menu())
         back_button.grid(row=5, column=5)
-
-        # Credits Widget
-        # credits_frame = tk.LabelFrame(
-        #     self, frame_styles, height=600, width=1024)
-        # credits_frame.place(relx=0, rely=1, anchor='sw')
-
-        # credits_frame.grid_rowconfigure(0, weight=1)
-        # credits_frame.grid_columnconfigure(0, weight=1)
-
-        # credits_text = tk.Label(credits_frame, text=f'Credits: {controller.machine_credits.balance}',
-        #                         font=(button_font[1], 35), fg='yellow', bg=self.main_frame['bg'],
-        #                         padx=20, pady=20, anchor='sw')
-
-        # cashout_button = tk.Button(credits_frame, text='Cashout', font=(button_font[1], 15),
-        #                            command=lambda: controller.machine_credits.deposit(
-        #                                100),
-        #                            padx=10, pady=5)
-
-        # add_credits_button = tk.Button(credits_frame, text='Add Credits', font=(button_font[1], 15),
-        #                                command=lambda: controller.machine_credits.deposit(
-        #                                    100),
-        #                                padx=10, pady=5)
-
-        # cashout_button.grid(row=4, column=0, sticky='nw', ipadx=10)
-        # add_credits_button.grid(row=4, column=0, sticky='ne', ipadx=10)
-        # credits_text.grid(row=5, column=0, sticky='sw')
-
 
 
 root = CasinoApp() #builds a root widget

@@ -6,7 +6,7 @@ class DealerHand(Hand):
 
     def __init__(self):
         super().__init__()
-
+        
         self.show_hand = False
 
     @property
