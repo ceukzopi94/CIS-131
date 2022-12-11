@@ -1,4 +1,9 @@
-"""Base Hand Class"""
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+Base Hand Class
+"""
 
 class Hand:
     """Base Hand Class to handle cards in hand."""
@@ -42,8 +47,8 @@ class Hand:
                 temp = hand[count]
                 hand[count] = hand[len(hand) - 1]
                 hand[len(hand) - 1] = temp
-                print(f'{hand[len(hand) - 1]} swaped with {hand[count]}')
-                #break
+                # print(f'{hand[len(hand) - 1]} swaped with {hand[count]}')
+                break
                 # temp = hand[count]
                 # hand.remove(hand[count])
                 # hand.append(temp)

@@ -1,4 +1,8 @@
-"""Deck class represents a deck of Cards."""
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+Deck class represents a deck of Cards."""
 import random
 from card import Card
 

@@ -1,4 +1,9 @@
-"""PlayerHand Sub Class"""
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+PlayerHand Sub Class
+"""
 
 from hand import Hand
 

@@ -1,3 +1,9 @@
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+"""
+
 import os
 import tkinter as tk #imports everything from tkinter
 from tkinter import font as font
@@ -270,7 +276,6 @@ class BettingChipsWidget(GUI):
         self.game.deal_button["state"] = 'normal'
 
 
-
 class CreditsWidget(GUI):
     """Class to control the credits widget."""
     def __init__(self, parent, controller):
@@ -397,42 +402,6 @@ class Blackjack(GUI):
         #Betting Chips GUI 
         self.betting_chips_gui = BettingChipsWidget(parent, controller, self)
 
-        # betting_chips_canvas = tk.Canvas(self.blackjack_frame)
-        # betting_chips_canvas.place(anchor='s', relx=.5, rely=1)
-
-        # self.bet_1_button = tk.Button(betting_chips_canvas, text='1', font= bet_btn_font,
-        #                             width=4,
-        #                             command=lambda: self.increase_bet(1),
-        #                             state='normal')
-                                    
-        # self.bet_5_button = tk.Button(betting_chips_canvas, text='5', font= bet_btn_font,
-        #                             width=4,
-        #                             command=lambda: self.increase_bet(5),
-        #                             state='normal')
-
-        # self.bet_10_button = tk.Button(betting_chips_canvas, text='10', font= bet_btn_font,
-        #                             width=4,
-        #                             command=lambda: self.increase_bet(10),
-        #                             state='normal')
-
-        # self.bet_25_button = tk.Button(betting_chips_canvas, text='25', font= bet_btn_font,
-        #                             width=4,
-        #                             command=lambda: self.increase_bet(25),
-        #                             state='normal')
-
-        # self.bet_100_button = tk.Button(betting_chips_canvas, text='100', font= bet_btn_font,
-        #                             width=4,
-        #                             command=lambda: self.increase_bet(100),
-        #                             state='normal')
-
-        # self.bet_buttons = (self.bet_1_button,self.bet_5_button,self.bet_10_button,self.bet_25_button,self.bet_100_button)
-
-        # self.bet_1_button.grid(row=0, column=0, sticky='w')
-        # self.bet_5_button.grid(row=0, column=1, sticky='w')
-        # self.bet_10_button.grid(row=0, column=2, sticky='w')
-        # self.bet_25_button.grid(row=0, column=3, sticky='w')
-        # self.bet_100_button.grid(row=0, column=4, sticky='w')
-
         #Current Bet GUI
         current_bet_canvas = tk.Canvas(self.blackjack_frame,height=100, width=200)
         current_bet_canvas.place(anchor='center', relx=.5, rely=.5)
@@ -448,7 +417,13 @@ class Blackjack(GUI):
         back_button = tk.Button(self.main_frame, text='More Games', font=button_font,
                                 command=lambda: controller.back_to_menu())
         back_button.place(anchor='se',relx=1, rely=1)
+
+        # self.p_card_lbls = []
+        # self.d_card_lbls = []
         
+        # self.cards_lbls = [self.p_card_lbls, self.d_card_lbls]
+
+
         # Start Of Gameplay
 
     
@@ -494,6 +469,8 @@ class Blackjack(GUI):
         self.dealer_hand.show_hand = False
         
         self.deal_cards()
+
+
         self.determine_blackjack()
 
 
@@ -514,7 +491,7 @@ class Blackjack(GUI):
         hand.add_card(card_to_add)
 
         #self.update_hand_gui(hand, card_to_add)
-        self.update_hand_gui(hand)
+        self.update_hand_gui()
 
         if(self.determine_hand_bust(self.player_hand)):
             self.hit_button['state'] = 'disabled'
@@ -527,6 +504,8 @@ class Blackjack(GUI):
     def stand(self):
         """Function to control the stand decision of the player."""
         self.disable_hit_stand_btns()
+
+        # self.hand_canvas[self.players.index(self.dealer_hand)].children.clear()
 
         self.play_dealer_hand()
         #self.player_status = self.BUST_STATUS
@@ -555,13 +534,16 @@ class Blackjack(GUI):
 
 
     def play_dealer_hand(self):
-        """Funtion to control the dealer gameplay."""
+        """Recursive Funtion to control the dealer gameplay."""
         self.dealer_hand.show_hand = True
-        self.update_hand_gui(self.dealer_hand)
+
+        #self.d_card_lbls = self.build_card_lbls(self.dealer_hand)
+
+        self.update_hand_gui()
 
         hand_value = self.dealer_hand.determine_hand_value()
 
-        if(hand_value < 17):
+        if(hand_value < 17): # base case for recursion call
             self.hit(self.dealer_hand)
 
             self.play_dealer_hand()
@@ -574,20 +556,13 @@ class Blackjack(GUI):
         if(self.player_hand.determine_hand_value() == 21 or self.dealer_hand.determine_hand_value() == 21):
             self.process_winner()
 
-        # if self.dealer_hand.determine_hand_value() == 21: 
-        #     if self.player_hand.determine_hand_value() == 21:
-        #         return self.PUSH_STATUS
-
-        #     return self.DEALER_BLACKJACK
-
-        # if self.player_hand.determine_hand_value() == 21:
-        #     return self.PLAYER_BLACKJACK
-
         return 
 
 
     def process_winner(self):
         """Function to contol the end of a hand and determine the winner"""
+        self.dealer_hand.show_hand = True
+        self.update_hand_gui()
         winner = self.determine_winner()
 
         #self.winner_lbl['state'] = 'normal'
@@ -598,27 +573,34 @@ class Blackjack(GUI):
 
         self.determine_payout(winner)
         self.betting_chips_gui.reset_bet()
-        #self.enable_bet_buttons()
 
 
     def determine_winner(self):
         """Function to determine the winner and return winnning status"""
-        if (self.determine_hand_bust(self.player_hand) and self.determine_hand_bust(self.dealer_hand)):
+        player_bust = self.determine_hand_bust(self.player_hand)
+        dealer_bust = self.determine_hand_bust(self.dealer_hand)
+
+        p_hand_value = self.player_hand.determine_hand_value()
+        d_hand_value = self.dealer_hand.determine_hand_value()
+
+        #if (self.determine_hand_bust(self.player_hand) and self.determine_hand_bust(self.dealer_hand)):
+        if (player_bust and dealer_bust):
             return (self.PUSH_STATUS)
         
-        if(self.determine_hand_bust(self.dealer_hand)):
+       #if (self.determine_hand_bust(self.dealer_hand)):
+        if (dealer_bust):
             return (self.PLAYER_WINS_STATUS)
 
-        if(self.determine_hand_bust(self.player_hand)):
+        if(player_bust):
             return (self.DEALER_WINS_STATUS)
 
-        if (self.player_hand.determine_hand_value() == self.dealer_hand.determine_hand_value()):
+        if ( d_hand_value == p_hand_value):
             return (self.PUSH_STATUS)
 
-        if (self.dealer_hand.determine_hand_value() > self.player_hand.determine_hand_value()):
+        if (d_hand_value > p_hand_value):
             return (self.DEALER_WINS_STATUS)
 
-        if (self.dealer_hand.determine_hand_value() < self.player_hand.determine_hand_value()):
+        if (d_hand_value < p_hand_value):
             return (self.PLAYER_WINS_STATUS)
 
 
@@ -667,7 +649,7 @@ class Blackjack(GUI):
     def clear_hand_gui(self):
         """Function to clear the hand gui"""
         for hand in self.hand_canvas:
-            hand.destroy()
+            hand.place_forget()
 
 
     def create_hand_canvas(self):
@@ -692,45 +674,121 @@ class Blackjack(GUI):
     #     card_lbl.image = card_img
     #     card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
 
-    def update_hand_gui(self, hand):
+
+    def update_hand_gui(self):
         """Function to update the hand GUI"""
+        #self.clear_hand_gui()
+        #self.hand_canvas = self.create_hand_canvas()
+
+
+        #self.hand_canvas[self.players.index(hand)].children.update()
+
+        for hands in self.players:
+
+            for card in hands.hand:
+
+                if (not hands.show_hand and hands.hand.index(card) == 0):
+                    player_card = Image.open(card.back_image)
+                else:
+                    player_card = Image.open(card.image_path)
+
+                player_card = player_card.resize((int(player_card.width/4), int(player_card.height/4)))
+                card_img = ImageTk.PhotoImage(player_card)
+                #print(hands.hand.index(card))
+                #self.hand_canvas[self.players.index(hands)].create_image(50 + (100 * (hands.hand.index(card))), 50, image=card_img, anchor='w')
+                #print(self.cards_lbls[self.players.index(hands)].count)
+
+                card_lbl = tk.Label(self.hand_canvas[self.players.index(hands)], image=card_img, padx=20)
+                card_lbl.configure(image=card_img)
+                card_lbl.image=card_img
+
+                card_lbl.grid(row=0, column=hands.hand.index(card), sticky='w')
+        #print(self.hand_canvas[self.players.index(hands)].winfo_children())
+
+
+    # def update_hand_gui(self, hand):
+    #     """Function to update the hand GUI"""
+
+    #     for card in hand.hand:
+
+    #         if (not hand.show_hand and hand.hand.index(card) == 0):
+    #             player_card = Image.open(card.back_image)
+    #             #print(card)
+    #         else:
+    #             player_card = Image.open(card.image_path)
+    #             #print(card)
+
+    #         #print(player_card)
+
+    #         player_card = player_card.resize(
+    #             (int(player_card.width/4), int(player_card.height/4)))
+    #         card_img = ImageTk.PhotoImage(player_card)
+
+    #         #self.hand_canvas[self.players.index(hand)].create_image(50,50,anchor='nw',image=card_img)
+
+    #         #card = tk.Label(
+    #         #    self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+    #         self.cards_lbls[self.players.index(hand)].image = card_img
+    #         #card.grid(row=0, column=len(hand.hand)-1, sticky='w')
+
+
+    # def update_hand_gui(self, hand):
+    #     """Function to update the hand GUI"""
+
+    #     cards_lbl = []
+
+    #     for card in hand.hand:
+
+    #         if (not hand.show_hand and hand.hand.index(card) == 0):
+    #             player_card = Image.open(card.back_image)
+    #             #print(card)
+    #         else:
+    #             player_card = Image.open(card.image_path)
+    #             #print(card)
+
+    #         #print(player_card)
+
+    #         player_card = player_card.resize(
+    #             (int(player_card.width/4), int(player_card.height/4)))
+    #         card_img = ImageTk.PhotoImage(player_card)
+
+    #         #self.hand_canvas[self.players.index(hand)].create_image(50,50,anchor='nw',image=card_img)
+
+    #         card_lbl = tk.Label(
+    #             self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+    #         card_lbl.image = card_img
+    #         card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
+
+    #         cards_lbl.append(card_lbl)
+
+    #     return cards_lbl
+
+
+    def build_card_lbls(self, hand): # to be deleted
+
+        cards_lbls = []
 
         for card in hand.hand:
-            if(not hand.show_hand and hand.hand.index(card) == 0):
-                player_card = Image.open(card.back_image)
-            else:
-                player_card = Image.open(card.image_path)
+            player_card = Image.open(card.image_path)
 
-            print(player_card)
-
-            player_card = player_card.resize((int(player_card.width/4), int(player_card.height/4)))
+            player_card = player_card.resize(
+                (int(player_card.width/4), int(player_card.height/4)))
             card_img = ImageTk.PhotoImage(player_card)
 
-            card_lbl = tk.Label(self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+            card_lbl = tk.Label(
+                self.hand_canvas[self.players.index(hand)], image=card_img, padx=20)
+            card_lbl.configure(image=card_img)
             card_lbl.image = card_img
             card_lbl.grid(row=0, column=len(hand.hand)-1, sticky='w')
+
+            cards_lbls.append(card_lbl)
+
+        return cards_lbls
 
     
     def update_current_bet_gui(self):
         """Function to control the current bet GUI to ensure it shows proper amount."""
         self.current_bet_amount_lbl.config(text=str(self.current_bet))
-
-
-    # def disable_bet_buttons(self):
-    #     """Function to disable the bet buttons using a for loop"""
-    #     for button in self.bet_buttons:
-    #         button['state'] = 'disabled'
-
-    
-    # def enable_bet_buttons(self):
-    #     """Function to enable the bet buttons using for loop"""
-    #     for button in self.bet_buttons:
-    #         #if()
-    #         if(int(button['text']) + self.current_bet <= int(self.credits_widget.credits.balance)):
-    #             print(int(self.credits_widget.credits.balance))
-    #             button['state'] = 'normal'
-    #         else:
-    #             button['state'] = 'disabled'
 
     
     def enable_hit_stand_btns(self):

@@ -1,4 +1,9 @@
-"""Account class definition"""
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+Account class definition
+"""
 from decimal import Decimal
 
 class Credits:

@@ -1,4 +1,9 @@
-"""Hand Subclass DealerHand"""
+"""
+Christian Urbanski
+12/06/2022
+CIS 131
+Hand Subclass DealerHand
+"""
 from hand import Hand
 
 class DealerHand(Hand):

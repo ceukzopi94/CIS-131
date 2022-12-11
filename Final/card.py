@@ -1,4 +1,11 @@
-"""Card class that represents a playing card and its image file name"""
+"""
+
+Christian Urbanski
+12/06/2022
+CIS 131
+Card class that represents a playing card and its image file name
+"""
+
 import os
 
 class Card:
@@ -8,11 +15,11 @@ class Card:
 
     def __init__(self, face, suit):
         """Initialize a Card with a face and suit"""
-        self._face = face
-        self._suit = suit
-        self._path = os.path.dirname(os.path.abspath(__file__)) 
-        self.image_path = "{}/card_images/{}.png".format(self._path, self.image_name)
-        self.back_image = "{}/card_images/back_of_card.png".format(self._path)
+        self.face = face
+        self.suit = suit
+        self.path = os.path.dirname(os.path.abspath(__file__)) 
+        self.image_path = "{}/card_images/{}.png".format(self.path, self.image_name)
+        self.back_image = "{}/card_images/back_of_card.png".format(self.path)
 
 
     @property
@@ -20,11 +27,21 @@ class Card:
         """Return the Card's self._face value"""
         return self._face
 
+    @face.setter
+    def face(self, face):
+        """Set the Card's face value."""
+        self._face = face
+
 
     @property
     def suit(self):
         """Return the Card's self._suit value"""
         return self._suit
+
+    @suit.setter
+    def suit(self, suit):
+        """Set the Card's face value."""
+        self._suit = suit
 
 
     @property
@@ -32,7 +49,28 @@ class Card:
         """Return the Card's image file name"""
         return str(self).replace(' ','_') 
 
-    
+
+    @property
+    def image_path(self):
+        """Retrun the Card's image path."""
+        return self._image_path
+
+    @image_path.setter
+    def image_path(self, path):
+        """Set Card's image path."""
+        self._image_path = path
+
+    @property
+    def back_image(self):
+        """Return the Card's back image path"""
+        return self._back_image
+
+    @back_image.setter
+    def back_image(self, path):
+        """Set Card's image path."""
+        self._back_image = path
+
+
     # def get_image_path(self):
     #     """Function to return the image path of the card"""
 
